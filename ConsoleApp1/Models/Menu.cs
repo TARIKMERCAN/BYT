@@ -13,7 +13,6 @@ namespace ConsoleApp1.Models
         [Required(ErrorMessage = "Menu type is required.")]
         [StringLength(50, MinimumLength = 3, ErrorMessage = "Menu type must be between 3 and 50 characters.")]
         public string MenuType { get; set; }
-
         public List<string> AvailableLanguages => new List<string> { "English", "Polish", "Turkish" };
 
         public List<Dish> Dishes { get; private set; } = new List<Dish>();
@@ -69,6 +68,27 @@ namespace ConsoleApp1.Models
 
             Console.WriteLine($"Dish with ID {dishId} not found in the menu '{Name}'.");
             return false;
+        }
+        
+        
+        //OVERRIDES
+        public override bool Equals(object? obj)
+        {
+            if (obj == null || GetType() != obj.GetType())
+                return false;
+    
+            var other = (Menu)obj;
+            return Name == other.Name && MenuType == other.MenuType;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Name, MenuType);
+        }
+
+        public override string ToString()
+        {
+            return $"Menu [Name: {Name}, Type: {MenuType}, Dishes Count: {Dishes.Count}]";
         }
     }
 }

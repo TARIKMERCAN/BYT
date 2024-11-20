@@ -67,5 +67,26 @@ namespace ConsoleApp1.Models
             }
             return true; 
         }
+        
+        
+        //OVERRIDES
+        public override bool Equals(object? obj)
+        {
+            if (obj == null || GetType() != obj.GetType())
+                return false;
+    
+            var other = (Reservation)obj;
+            return IdReservation == other.IdReservation && DateOfReservation == other.DateOfReservation && ReservedTable.Equals(other.ReservedTable);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(IdReservation, DateOfReservation, ReservedTable);
+        }
+
+        public override string ToString()
+        {
+            return $"Reservation [ID: {IdReservation}, Date: {DateOfReservation}, Table ID: {ReservedTable?.IdTable}]";
+        }
     }
 }

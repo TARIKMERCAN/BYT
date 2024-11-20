@@ -27,5 +27,26 @@ namespace ConsoleApp1.Models
         {
             Console.WriteLine($"Vale ID: {IdVale}, Assigned Location: {AssignedLocation}");
         }
+        
+       
+        //OVERRIDES
+        public override bool Equals(object? obj)
+        {
+            if (obj is Vale other)
+            {
+                return IdVale == other.IdVale && AssignedLocation == other.AssignedLocation;
+            }
+            return false;
+        }
+        
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(IdVale, AssignedLocation);
+        }
+
+        public override string ToString()
+        {
+            return $"Vale ID: {IdVale}, Assigned Location: {AssignedLocation}";
+        }
     }
 }

@@ -43,5 +43,24 @@ namespace ConsoleApp1.Models
             waiter.AssignTable(table);
             return true;
         }
+        
+        //OVERRIDES
+        public override bool Equals(object obj)
+        {
+            if (obj is not Manager other)
+                return false;
+
+            return IdManager == other.IdManager && Level == other.Level;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(IdManager, Level);
+        }
+
+        public override string ToString()
+        {
+            return $"Manager(IdManager={IdManager}, Level={Level})";
+        }
     }
 }

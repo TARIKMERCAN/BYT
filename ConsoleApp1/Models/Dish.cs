@@ -27,7 +27,8 @@ namespace ConsoleApp1.Models
         [Required(ErrorMessage = "Price is required.")]
         [Range(0.01, 1000.00, ErrorMessage = "Price must be between $0.01 and $1000.")]
         public decimal Price { get; set; }
-
+        public decimal DiscountedPrice => Price * 0.9m;  // 10% discount
+        
         [Required(ErrorMessage = "Ingredients list cannot be empty.")]
         [MinLength(1, ErrorMessage = "At least one ingredient is required.")]
         public List<string> Ingredients { get; set; } = new List<string>();
@@ -86,5 +87,26 @@ namespace ConsoleApp1.Models
             Console.WriteLine($"Dish with ID {idDish} not found.");
             return false;
         }
+        
+        
+        //OVERRIDES
+        public override bool Equals(object obj)
+        {
+            if (obj is not Dish other)
+                return false;
+
+            return IdDish == other.IdDish && Name == other.Name;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(IdDish, Name);
+        }
+
+        public override string ToString()
+        {
+            return $"Dish(IdDish={IdDish}, Name={Name}, Price={Price:C}, Discounted Price={DiscountedPrice:C})";
+        }
+
     }
 }

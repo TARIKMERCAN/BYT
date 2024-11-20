@@ -26,5 +26,26 @@ namespace ConsoleApp1.Models
             
             return newMember;
         }
+        
+        
+        //OVERRIDES
+        public override bool Equals(object? obj)
+        {
+            if (obj == null || GetType() != obj.GetType())
+                return false;
+    
+            var other = (NonMember)obj;
+            return Id == other.Id;
+        }
+
+        public override int GetHashCode()
+        {
+            return Id.GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            return $"NonMember [ID: {Id}]";
+        }
     }
 }

@@ -53,7 +53,7 @@ public class UnitTest1
         public void PlaceOrder_WithValidDishes_ReturnsOrder()
         {
             var order = _customer.PlaceOrder(_dishes);
-            Assert.AreEqual(1, order.Items.Count);
+            Assert.AreEqual(1, order.TotalItems);
             Assert.AreEqual(10.00m, order.TotalAmount);
         }
 
@@ -72,7 +72,7 @@ public class UnitTest1
             Assert.That(ex.Message, Is.EqualTo("At least one dish must be ordered."));
         }
     }
-    
+
     [TestFixture]
     public class DishTests
     {
@@ -104,7 +104,7 @@ public class UnitTest1
             Assert.AreEqual(10.00m, dish.Price);
         }
     }
-        
+
     [TestFixture]
     public class OrderTests
     {
@@ -113,8 +113,8 @@ public class UnitTest1
         {
             var order = new Order();
             var dish = new Dish { IdDish = 1, Name = "Pizza", Price = 15.00m };
-            order.AddItem(dish);
-            Assert.AreEqual(1, order.Items.Count);
+            order.AddItem(dish,1);
+            Assert.AreEqual(1, order.TotalItems);
             Assert.AreEqual(15.00m, order.TotalAmount);
         }
 
@@ -122,8 +122,8 @@ public class UnitTest1
         public void CalculateTotal_MultipleDishes_CalculatesCorrectTotal()
         {
             var order = new Order();
-            order.AddItem(new Dish { IdDish = 1, Name = "Pizza", Price = 15.00m });
-            order.AddItem(new Dish { IdDish = 2, Name = "Salad", Price = 5.00m });
+            order.AddItem(new Dish { IdDish = 1, Name = "Pizza", Price = 15.00m },1);
+            order.AddItem(new Dish { IdDish = 2, Name = "Salad", Price = 5.00m },1);
             var total = order.CalculateTotal();
             Assert.AreEqual(20.00m, total);
         }
@@ -144,13 +144,14 @@ public class UnitTest1
         [Test]
         public void RefundPayment_CompletedPayment_RefundsSuccessfully()
         {
-            var payment = new Payment { IdPayment = 1, Amount = 100.00m, Method = PaymentMethod.Card, Status = PaymentStatus.Completed };
+            var payment = new Payment
+                { IdPayment = 1, Amount = 100.00m, Method = PaymentMethod.Card, Status = PaymentStatus.Completed };
             var result = payment.RefundPayment();
             Assert.IsTrue(result);
             Assert.AreEqual(PaymentStatus.Refunded, payment.Status);
         }
     }
-    
+
     [TestFixture]
     public class ExecutiveChefTests
     {
@@ -175,7 +176,7 @@ public class UnitTest1
             Assert.DoesNotThrow(() => _chef.TrainSousChef(sousChef));
         }
     }
-    
+
     [TestFixture]
     public class EmployeeTests
     {
@@ -186,7 +187,7 @@ public class UnitTest1
             var leavingDate = new DateTime(2021, 1, 1);
             var employee = new Employee { IdEmployee = 1, DateOfHiring = hiringDate, DateOfLeaving = leavingDate };
             var employedTime = employee.GetEmployedTime();
-            Assert.AreEqual(366, employedTime);  
+            Assert.AreEqual(366, employedTime);
         }
 
         [Test]
@@ -195,10 +196,10 @@ public class UnitTest1
             var hiringDate = DateTime.Now.AddDays(-100);
             var employee = new Employee { IdEmployee = 1, DateOfHiring = hiringDate };
             var employedTime = employee.GetEmployedTime();
-            Assert.AreEqual(100, employedTime, 1); 
+            Assert.AreEqual(100, employedTime, 1);
         }
     }
-    
+
     [TestFixture]
     public class ManagerTests
     {
@@ -225,12 +226,12 @@ public class UnitTest1
         [Test]
         public void AssignTableToWaiter_AlreadyAssignedTable_ReturnsFalse()
         {
-            _waiter.AssignTable(_table); 
+            _waiter.AssignTable(_table);
             bool result = _manager.AssignTableToWaiter(_waiter, _table);
-            Assert.IsFalse(result); 
+            Assert.IsFalse(result);
         }
     }
-    
+
     [TestFixture]
     public class MemberTests
     {
@@ -240,7 +241,7 @@ public class UnitTest1
         [SetUp]
         public void Setup()
         {
-            _member = new Member(1, 100);  
+            _member = new Member(1, 100);
             _dishes = new[] { new Dish { IdDish = 1, Name = "Pasta", Price = 12.99m } };
         }
 
@@ -248,7 +249,7 @@ public class UnitTest1
         public void PlaceOrder_WithValidDishes_IncreasesCreditPoints()
         {
             var order = _member.PlaceOrder(_dishes);
-            Assert.AreEqual(101, _member.CreditPoints);  
+            Assert.AreEqual(101, _member.CreditPoints);
         }
 
         [Test]
@@ -264,10 +265,10 @@ public class UnitTest1
         {
             bool result = _member.UseCredits(150);
             Assert.IsFalse(result);
-            Assert.AreEqual(100, _member.CreditPoints);  
+            Assert.AreEqual(100, _member.CreditPoints);
         }
     }
-    
+
     [TestFixture]
     public class MenuTests
     {
@@ -297,8 +298,8 @@ public class UnitTest1
             Assert.IsEmpty(_menu.Dishes);
         }
     }
-    
-    
+
+
     [TestFixture]
     public class NonMemberTests
     {
@@ -337,7 +338,7 @@ public class UnitTest1
         public void TotalPrice_CalculateBasedOnQuantity_CalculatesCorrectly()
         {
             var totalPrice = _orderDish.TotalPrice;
-            Assert.AreEqual(7.00m, totalPrice); 
+            Assert.AreEqual(7.00m, totalPrice);
         }
     }
 
@@ -364,13 +365,13 @@ public class UnitTest1
         public void ValidateBirthDate_FutureDate_ReturnsError()
         {
             var validationContext = new ValidationContext(new Person());
-            var birthOfDate = DateTime.Now.AddDays(1);  
+            var birthOfDate = DateTime.Now.AddDays(1);
             var result = Person.ValidateBirthDate(birthOfDate, validationContext);
             Assert.IsNotNull(result);
             Assert.AreEqual("Birth date cannot be in the future.", result.ErrorMessage);
         }
     }
-    
+
     [TestFixture]
     public class ReservationTests
     {
@@ -395,12 +396,13 @@ public class UnitTest1
         [Test]
         public void ReserveTable_PastDate_ReturnsFalse()
         {
-            var pastDateReservation = new Reservation { IdReservation = 2, DateOfReservation = DateTime.Now.AddDays(-1) };
+            var pastDateReservation = new Reservation
+                { IdReservation = 2, DateOfReservation = DateTime.Now.AddDays(-1) };
             bool result = pastDateReservation.ReserveTable(_table);
             Assert.IsFalse(result);
         }
     }
-    
+
     [TestFixture]
     public class RestaurantTests
     {
@@ -457,7 +459,7 @@ public class UnitTest1
         }
     }
 
-    
+
     [TestFixture]
     public class TableTests
     {
@@ -488,8 +490,8 @@ public class UnitTest1
             _vale.DisplayValeInfo();
         }
     }
-    
-    
+
+
     [TestFixture]
     public class WaiterTests
     {
@@ -526,51 +528,75 @@ public class UnitTest1
             Assert.IsFalse(result);
         }
     }
-    
-    
+
     [TestFixture]
     public class SerializableObjectTests
     {
         [Test]
         public void AddInstance_AddsCorrectly()
         {
-            var dish = new Dish { IdDish = 1, Name = "Salad" };
-            SerializableObject<Dish>.AddInstance(dish);
-            Assert.Contains(dish, SerializableObject<Dish>.Instances);
-            SerializableObject<Dish>.ClearInstances(); 
-        }
-    }
-
-    
-    [TestFixture]
-    public class SerializationManagerTests
-    {
-        [Test]
-        public async Task SerializeToXmlAsync_SerializesDataCorrectly()
-        {
-            var dishes = new List<Dish>
-            {
-                new Dish { IdDish = 1, Name = "Pizza", Price = 15.00m }
-            };
-            await SerializationManager.SerializeToXmlAsync(dishes);
-            var deserializedDishes = await SerializationManager.DeserializeFromXmlAsync<Dish>();
-            Assert.AreEqual(dishes.Count, deserializedDishes.Count);
-            Assert.AreEqual(dishes[0].Name, deserializedDishes[0].Name);
-            File.Delete(SerializationManager.XmlFilePath);
+            var chef = new Chef { IdChef = 1, CuisineType = "Italian" };
+            SerializableObject<Chef>.AddInstance(chef);
+            Assert.Contains(chef, SerializableObject<Chef>.Instances);
+            SerializableObject<Chef>.Instances.Clear();
         }
 
         [Test]
-        public async Task DeserializeFromJsonAsync_DeserializesDataCorrectly()
+        public void AddInstance_DuplicateIsNotAdded()
         {
-            var dishes = new List<Dish>
-            {
-                new Dish { IdDish = 1, Name = "Burger", Price = 8.99m }
-            };
-            await SerializationManager.SerializeToJsonAsync(dishes);
-            var deserializedDishes = await SerializationManager.DeserializeFromJsonAsync<Dish>();
-            Assert.AreEqual(dishes.Count, deserializedDishes.Count);
-            Assert.AreEqual(dishes[0].Name, deserializedDishes[0].Name);
-            File.Delete(SerializationManager.JsonFilePath);
+            var chef1 = new Chef { IdChef = 1, CuisineType = "Italian" };
+            var chef2 = new Chef { IdChef = 1, CuisineType = "Italian" }; 
+            SerializableObject<Chef>.AddInstance(chef1);
+            SerializableObject<Chef>.AddInstance(chef2); 
+            Assert.AreEqual(1, SerializableObject<Chef>.Instances.Count);
+            SerializableObject<Chef>.Instances.Clear();
+        }
+
+        [Test]
+        public void SaveExtent_SavesToXmlFile()
+        {
+            var chef = new Chef { IdChef = 1, CuisineType = "Italian" };
+            SerializableObject<Chef>.AddInstance(chef);
+            SerializableObject<Chef>.SaveExtent();
+            var filePath = $"{typeof(Chef).Name}_Extent.xml";
+            Assert.IsTrue(File.Exists(filePath), "XML file should be saved.");
+            File.Delete(filePath);
+            SerializableObject<Chef>.Instances.Clear();
+        }
+
+        [Test]
+        public void LoadExtent_LoadsFromXmlFile()
+        {
+            var chef = new Chef { IdChef = 1, CuisineType = "Italian" };
+            SerializableObject<Chef>.AddInstance(chef);
+            SerializableObject<Chef>.SaveExtent();
+            SerializableObject<Chef>.Instances.Clear(); 
+            SerializableObject<Chef>.LoadExtent();
+            Assert.AreEqual(1, SerializableObject<Chef>.Instances.Count);
+            Assert.AreEqual("Italian", SerializableObject<Chef>.Instances.First().CuisineType);
+            File.Delete($"{typeof(Chef).Name}_Extent.xml");
+        }
+
+        [Test]
+        public void SaveExtent_IncludesMetadata()
+        {
+            var chef = new Chef { IdChef = 1, CuisineType = "Italian" };
+            SerializableObject<Chef>.AddInstance(chef);
+            SerializableObject<Chef>.SaveExtent();
+            var filePath = $"{typeof(Chef).Name}_Extent.xml";
+            var xmlContent = File.ReadAllText(filePath);
+            Assert.IsTrue(xmlContent.Contains("<Metadata>"), "Metadata should be included in the XML file.");
+            File.Delete(filePath);
+            SerializableObject<Chef>.Instances.Clear();
+        }
+
+        [Test]
+        public void LoadExtent_HandlesEmptyFileGracefully()
+        {
+            var filePath = $"{typeof(Chef).Name}_Extent.xml";
+            if (File.Exists(filePath)) File.Delete(filePath);
+            SerializableObject<Chef>.LoadExtent();
+            Assert.AreEqual(0, SerializableObject<Chef>.Instances.Count, "Instances should be empty when loading from an empty file.");
         }
     }
 }

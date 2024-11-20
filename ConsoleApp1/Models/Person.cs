@@ -37,5 +37,26 @@ namespace ConsoleApp1.Models
             }
             return ValidationResult.Success;
         }
+        
+        
+        //OVERRIDES
+        public override bool Equals(object? obj)
+        {
+            if (obj == null || GetType() != obj.GetType())
+                return false;
+    
+            var other = (Person)obj;
+            return IdPerson == other.IdPerson && FirstName == other.FirstName && LastName == other.LastName;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(IdPerson, FirstName, LastName);
+        }
+
+        public override string ToString()
+        {
+            return $"Person [ID: {IdPerson}, Name: {FirstName} {LastName}, Birth Date: {BirthOfDate.ToShortDateString()}, Phone: {PhoneNumber}]";
+        }
     }
 }

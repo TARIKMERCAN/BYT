@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using ConsoleApp1.Interfaces;
 using ConsoleApp1.Services;
 
 namespace ConsoleApp1.Models
 {
-    public class Chef : SerializableObject<Chef>
+    public class Chef : SerializableObject<Chef>, ICuisineSpecialist, IKitchenManager
     {
         [Required(ErrorMessage = "Chef ID is required.")]
         [Range(1, int.MaxValue, ErrorMessage = "Chef ID must be a positive integer.")]
@@ -21,6 +22,15 @@ namespace ConsoleApp1.Models
             CuisineType = cuisineType;
         }
         
+        public void DevelopCuisine()
+        {
+            Console.WriteLine($"Chef {IdChef} is developing recipes for {CuisineType} cuisine.");
+        }
+        
+        public void ManageKitchen()
+        {
+            Console.WriteLine($"Chef {IdChef} is managing the kitchen.");
+        }
         
         //METHODS
         public void AssignTask(string task)
@@ -30,6 +40,25 @@ namespace ConsoleApp1.Models
                 throw new ArgumentException("Task cannot be null or empty.", nameof(task));
             }
             Console.WriteLine($"Chef {IdChef} (Cuisine: {CuisineType}) has been assigned the task: {task}");
+        }
+        
+        //OVERRIDES
+        public override bool Equals(object obj)
+        {
+            if (obj is not Chef other)
+                return false;
+
+            return IdChef == other.IdChef && CuisineType == other.CuisineType;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(IdChef, CuisineType);
+        }
+
+        public override string ToString()
+        {
+            return $"Chef(IdChef={IdChef}, CuisineType={CuisineType})";
         }
     }
 }

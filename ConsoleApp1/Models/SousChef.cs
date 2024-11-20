@@ -19,6 +19,7 @@ namespace ConsoleApp1.Models
             Speciality = speciality;
             SupervisionLevel = supervisionLevel;
         }
+        public SousChef() {}
 
         
         //METHODS
@@ -35,6 +36,24 @@ namespace ConsoleApp1.Models
             }
 
             Console.WriteLine($"Sous Chef {IdChef} is assisting Executive Chef {headChef.IdChef} in {headChef.CuisineType} cuisine.");
+        }
+        
+
+        //OVERRIDES
+        public bool Equals(SousChef other)
+        {
+            if (other == null) return false;
+            return this.IdChef == other.IdChef && this.Speciality == other.Speciality;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as SousChef);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(IdChef, Speciality);
         }
     }
 }

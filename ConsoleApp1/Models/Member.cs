@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Xml.Serialization;
 using ConsoleApp1;
 using ConsoleApp1.Services;
 
@@ -16,10 +17,11 @@ namespace ConsoleApp1.Models
         private int creditPoints;
 
         [Range(0, int.MaxValue, ErrorMessage = "Credit points cannot be negative.")]
+        [XmlElement("CreditPoints")]
         public int CreditPoints
         {
-            get { return creditPoints; }
-            private set { creditPoints = Math.Max(0, value); }
+            get => creditPoints; 
+            set => creditPoints = Math.Max(0, value); 
         }
         
         public Member() { }
@@ -38,10 +40,11 @@ namespace ConsoleApp1.Models
                 throw new ArgumentException("At least one dish must be ordered.");
             }
             
-            Order order = new Order { IdOrder = Order.Instances.Count + 1 };
+            var order = new Order { IdOrder = Order.Instances.Count + 1 };
             foreach (var dish in dishes)
-            {
-                order.AddItem(dish);
+            {   
+                int quantity = 1;
+                order.AddItem(dish, quantity);
             }
 
             Order.AddInstance(order);
@@ -57,13 +60,7 @@ namespace ConsoleApp1.Models
                 Console.WriteLine("Points to use must be greater than zero.");
                 return false;
             }
-
-            if (CreditPoints < 10)
-            {
-                Console.WriteLine($"Insufficient credit points to use. Minimum required: 10, Available: {CreditPoints}");
-                return false;
-            }
-
+            
             if (pointsToUse > CreditPoints)
             {
                 Console.WriteLine($"Insufficient credit points. Available: {CreditPoints}, Requested: {pointsToUse}");
@@ -73,6 +70,28 @@ namespace ConsoleApp1.Models
             CreditPoints -= pointsToUse;
             Console.WriteLine($"{pointsToUse} credit points used. Remaining points: {CreditPoints}");
             return true;
+        }
+        
+        //OVERRIDES
+        public override bool Equals(object? obj)
+        {
+            if (obj == null || GetType() != obj.GetType())
+            {
+                return false;
+            }
+
+            var other = (Member)obj;
+            return IdMember == other.IdMember && CreditPoints == other.CreditPoints && Email == other.Email;
+        }
+        
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(IdMember, CreditPoints, Email);
+        }
+
+        public override string ToString()
+        {
+            return $"Member(ID: {IdMember}, Email: {Email ?? "N/A"}, Credit Points: {CreditPoints})";
         }
     }
 }

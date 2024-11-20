@@ -43,5 +43,26 @@ namespace ConsoleApp1.Models
             Console.WriteLine($"Table with ID {tableId} not found in Waiter {IdWaiter}'s assigned tables.");
             return false;
         }
+        
+        
+        //OVERRIDES
+        public override bool Equals(object? obj)
+        {
+            if (obj is Waiter other)
+            {
+                return IdWaiter == other.IdWaiter && AssignedTables.SequenceEqual(other.AssignedTables);
+            }
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(IdWaiter, AssignedTables);
+        }
+
+        public override string ToString()
+        {
+            return $"Waiter ID: {IdWaiter}, Assigned Tables: {AssignedTables.Count}";
+        }
     }
 }

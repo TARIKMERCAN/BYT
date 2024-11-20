@@ -21,11 +21,32 @@ namespace ConsoleApp1.Models {
         public string Department { get; set; }
 
         
+        
+        
         //METHODS
         public int GetEmployedTime()
         {
             DateTime endDate = DateOfLeaving ?? DateTime.Now;
             return (endDate - DateOfHiring).Days;
+        }
+        
+        //OVERRIDES
+        public override bool Equals(object obj)
+        {
+            if (obj is not Employee other)
+                return false;
+
+            return IdEmployee == other.IdEmployee && DateOfHiring == other.DateOfHiring;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(IdEmployee, DateOfHiring);
+        }
+
+        public override string ToString()
+        {
+            return $"Employee(IdEmployee={IdEmployee}, DateOfHiring={DateOfHiring.ToShortDateString()})";
         }
     }
 }

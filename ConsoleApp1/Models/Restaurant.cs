@@ -58,5 +58,26 @@ namespace ConsoleApp1.Models
             Console.WriteLine($"Table with ID {tableId} not found in restaurant '{Name}'.");
             return false;
         }
+        
+        
+        //OVERRIDES
+        public override bool Equals(object? obj)
+        {
+            if (obj == null || GetType() != obj.GetType())
+                return false;
+    
+            var other = (Restaurant)obj;
+            return Name == other.Name && MaxCapacity == other.MaxCapacity;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Name, MaxCapacity);
+        }
+
+        public override string ToString()
+        {
+            return $"Restaurant [Name: {Name}, Max Capacity: {MaxCapacity}, Tables Count: {Tables.Count}]";
+        }
     }
 }

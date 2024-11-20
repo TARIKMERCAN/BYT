@@ -25,5 +25,26 @@ namespace ConsoleApp1.Models
             NumberOfChairs = numberOfChairs;
             TableType = tableType;
         }
+        
+       
+        //OVERRIDES
+        public override bool Equals(object? obj)
+        {
+            if (obj is Table other)
+            {
+                return IdTable == other.IdTable && NumberOfChairs == other.NumberOfChairs && TableType == other.TableType;
+            }
+            return false;
+        }
+        
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(IdTable, NumberOfChairs, TableType);
+        }
+        
+        public override string ToString()
+        {
+            return $"Table {IdTable} - Type: {TableType}, Chairs: {NumberOfChairs}";
+        }
     }
 }

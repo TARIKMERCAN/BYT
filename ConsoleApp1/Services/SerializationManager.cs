@@ -7,49 +7,48 @@ using System.Threading.Tasks;
 
 namespace ConsoleApp1.Services
 {
-    public class SerializationManager
+    public static class SerializationManager
     {
-        public static readonly string XmlFilePath = "Instances.xml";
-        public static readonly string JsonFilePath = "Instances.json";
-
-        public static async Task SerializeToXmlAsync<T>(List<T> items)
+        public static void SerializeToXml<T>(List<T> objects, string filePath = null)
         {
-            XmlSerializer serializer = new XmlSerializer(typeof(List<T>));
-            await using var writer = new FileStream(XmlFilePath, FileMode.Create);
-            serializer.Serialize(writer, items);
-        }
+            filePath ??= $"{typeof(T).Name}_Extent.xml";
 
-        public static async Task<List<T>> DeserializeFromXmlAsync<T>()
-        {
             try
             {
-                if (!File.Exists(XmlFilePath))
-                    return new List<T>();
-
-                XmlSerializer serializer = new XmlSerializer(typeof(List<T>));
-                await using var reader = new FileStream(XmlFilePath, FileMode.Open);
-                return (List<T>)serializer.Deserialize(reader) ?? new List<T>();
+                using var writer = new StreamWriter(filePath);
+                var serializer = new XmlSerializer(typeof(List<T>));
+                serializer.Serialize(writer, objects);
+                Console.WriteLine($"Serialized {objects.Count} {typeof(T).Name} objects to {filePath}.");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred during XML deserialization: {ex.Message}");
-                return new List<T>();
+                Console.WriteLine($"Error during XML serialization of {typeof(T).Name}: {ex.Message}");
             }
         }
-
-        public static async Task SerializeToJsonAsync<T>(List<T> items)
+       
+        public static List<T> DeserializeFromXml<T>(string filePath = null)
         {
-            await using var stream = File.Create(JsonFilePath);
-            await JsonSerializer.SerializeAsync(stream, items, new JsonSerializerOptions { WriteIndented = true });
-        }
+            filePath ??= $"{typeof(T).Name}_Extent.xml";
 
-        public static async Task<List<T>> DeserializeFromJsonAsync<T>()
-        {
-            if (!File.Exists(JsonFilePath))
+            if (!File.Exists(filePath))
+            {
+                Console.WriteLine($"File {filePath} not found. Returning an empty list for {typeof(T).Name}.");
                 return new List<T>();
+            }
 
-            await using var stream = File.OpenRead(JsonFilePath);
-            return await JsonSerializer.DeserializeAsync<List<T>>(stream) ?? new List<T>();
+            try
+            {
+                using var reader = new StreamReader(filePath);
+                var serializer = new XmlSerializer(typeof(List<T>));
+                var objects = (List<T>)serializer.Deserialize(reader) ?? new List<T>();
+                Console.WriteLine($"Deserialized {objects.Count} {typeof(T).Name} objects from {filePath}.");
+                return objects;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error during XML deserialization of {typeof(T).Name}: {ex.Message}");
+                return new List<T>();
+            }
         }
     }
 }

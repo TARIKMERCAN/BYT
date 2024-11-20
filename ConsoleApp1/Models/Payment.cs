@@ -55,5 +55,26 @@ namespace ConsoleApp1.Models
             Console.WriteLine($"Payment {IdPayment} of {Amount:C} has been refunded.");
             return true;
         }
+        
+        
+        //OVERRIDES
+        public override bool Equals(object? obj)
+        {
+            if (obj == null || GetType() != obj.GetType())
+                return false;
+    
+            var other = (Payment)obj;
+            return IdPayment == other.IdPayment && Amount == other.Amount && Method == other.Method;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(IdPayment, Amount, Method);
+        }
+
+        public override string ToString()
+        {
+            return $"Payment [ID: {IdPayment}, Amount: {Amount:C}, Method: {Method}, Status: {Status}]";
+        }
     }
 }

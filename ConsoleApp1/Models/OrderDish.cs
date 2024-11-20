@@ -18,11 +18,8 @@ namespace ConsoleApp1.Models
         public OrderDish(){}
         public OrderDish(Dish dish, int quantity)
         {
-            if (dish == null) throw new ArgumentNullException(nameof(dish), "Dish cannot be null.");
-            if (quantity <= 0) throw new ArgumentException("Quantity must be greater than zero.", nameof(quantity));
-
-            Dish = dish;
-            Quantity = quantity;
+            Dish = dish ?? throw new ArgumentNullException(nameof(dish), "Dish cannot be null.");
+            Quantity = quantity <= 0 ? throw new ArgumentException("Quantity must be greater than zero.") : quantity;
         }
 
         
@@ -30,6 +27,27 @@ namespace ConsoleApp1.Models
         public void DisplayOrderDish()
         {
             Console.WriteLine($"Dish: {Dish.Name}, Quantity: {Quantity}, Unit Price: {UnitPrice:C}, Total Price: {TotalPrice:C}");
+        }
+        
+        
+        //OVERRIDES
+        public override bool Equals(object? obj)
+        {
+            if (obj == null || GetType() != obj.GetType())
+                return false;
+    
+            var other = (OrderDish)obj;
+            return Dish.Equals(other.Dish) && Quantity == other.Quantity;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Dish, Quantity);
+        }
+
+        public override string ToString()
+        {
+            return $"OrderDish [Dish: {Dish.Name}, Quantity: {Quantity}, Total Price: {TotalPrice:C}]";
         }
     }
 }
