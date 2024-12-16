@@ -42,6 +42,15 @@ namespace ConsoleApp1.Models
             Console.WriteLine($"Chef {IdChef} (Cuisine: {CuisineType}) has been assigned the task: {task}");
         }
         
+        public void AddDish(Dish dish, Menu menu)
+        {
+            if (dish == null || menu == null)
+                throw new ArgumentNullException("Dish or Menu cannot be null.");
+
+            menu.AddDish(dish);
+            Console.WriteLine($"Chef {IdChef} added Dish {dish.Name} to Menu {menu.Name}.");
+        }
+        
         //OVERRIDES
         public override bool Equals(object obj)
         {

@@ -13,9 +13,18 @@ public class Order : SerializableObject<Order>
     
     public decimal TotalAmount => CalculateTotal();  
     
-    public List<OrderDish> OrderDishes { get; private set; } = new List<OrderDish>();  
+    public List<OrderDish> OrderDishes { get; private set; } = new List<OrderDish>();
+    public Customer Customer { get; private set; }  
     
     public int TotalItems => OrderDishes.Sum(orderDish => orderDish.Quantity);  
+    
+    public void SetCustomer(Customer customer)
+    {
+        if (Customer == customer) return;
+        Customer?.RemoveOrder(this);
+        Customer = customer;
+        Customer?.AddOrder(this);
+    }
     
     public void AddItem(Dish dish, int quantity)
     {

@@ -26,14 +26,19 @@ namespace ConsoleApp1.Models
 
         
         // METHODS
-        public bool ReserveTable(Table table)
+        public bool ReserveTable(Table table, int minCapacity, int maxCapacity)
         {
             if (table == null)
-            {
                 throw new ArgumentNullException(nameof(table), "Table cannot be null.");
+
+            if (table.NumberOfChairs < minCapacity || table.NumberOfChairs > maxCapacity)
+            {
+                Console.WriteLine($"Table {table.IdTable} does not meet capacity requirements: " +
+                                  $"Required: {minCapacity}-{maxCapacity}, Available: {table.NumberOfChairs}.");
+                return false;
             }
-            
-            if (DateOfReservation < DateTime.Now)
+
+            if (DateOfReservation.Date < DateTime.Now.Date)
             {
                 Console.WriteLine($"Cannot reserve table for past dates. Attempted reservation for {DateOfReservation}.");
                 return false;
@@ -48,25 +53,27 @@ namespace ConsoleApp1.Models
             }
 
             ReservedTable = table;
-            Console.WriteLine($"Reservation {IdReservation} has reserved Table {table.IdTable} on {DateOfReservation}.");
+            Console.WriteLine($"Reservation {IdReservation} confirmed for Table {table.IdTable}.");
             return true;
         }
+
 
 
         private bool CheckTableAvailability(Table table, DateTime reservationDate)
         {
             var existingReservations = Reservation.Instances;
-
             foreach (var reservation in existingReservations)
             {
                 if (reservation.ReservedTable.IdTable == table.IdTable &&
                     reservation.DateOfReservation.Date == reservationDate.Date)
                 {
+                    Console.WriteLine($"Conflict found: Table {table.IdTable} already reserved for {reservation.DateOfReservation}.");
                     return false; 
                 }
             }
             return true; 
         }
+
         
         
         //OVERRIDES

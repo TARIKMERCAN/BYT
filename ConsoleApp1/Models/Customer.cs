@@ -10,7 +10,28 @@ namespace ConsoleApp1.Models
         [Range(1, int.MaxValue, ErrorMessage = "Customer ID must be a positive integer.")]
         public int IdCustomer { get; set; }
 
+        private readonly List<Order> _orders = new();
+        public IReadOnlyList<Order> Orders => _orders.AsReadOnly();
+        
+        public void AddOrder(Order order)
+        {
+            if (order == null) throw new ArgumentNullException(nameof(order));
+            if (!_orders.Contains(order))
+            {
+                _orders.Add(order);
+                order.SetCustomer(this);
+            }
+        }
 
+        public void RemoveOrder(Order order)
+        {
+            if (order == null) return;
+            if (_orders.Contains(order))
+            {
+                _orders.Remove(order);
+                order.SetCustomer(null);
+            }
+        }
         //METHODS
         public Order PlaceOrder(Dish[] dishes)
         {

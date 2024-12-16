@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿    using System.ComponentModel.DataAnnotations;
 using ConsoleApp1;
 using ConsoleApp1.Enums;
 using ConsoleApp1.Services;
@@ -32,15 +32,23 @@ namespace ConsoleApp1.Models
 
         
         //METHODS
-        public bool ProcessPayment()
+        public bool ProcessPayment(bool useCredits = false)
         {
             if (Status != PaymentStatus.Pending)
             {
                 Console.WriteLine($"Payment {IdPayment} is already {Status}. Cannot process again.");
                 return false;
             }
+
+            if (useCredits)
+            {
+                Console.WriteLine($"Credits applied for Payment {IdPayment}.");
+                Status = PaymentStatus.Completed;
+                return true;
+            }
+
+            Console.WriteLine($"Processing payment {IdPayment} using {Method}.");
             Status = PaymentStatus.Completed;
-            Console.WriteLine($"Payment {IdPayment} of {Amount:C} has been processed successfully using {Method}.");
             return true;
         }
         
@@ -52,7 +60,7 @@ namespace ConsoleApp1.Models
                 return false;
             }
             Status = PaymentStatus.Refunded;
-            Console.WriteLine($"Payment {IdPayment} of {Amount:C} has been refunded.");
+            Console.WriteLine($"Payment {IdPayment} has been refunded.");
             return true;
         }
         

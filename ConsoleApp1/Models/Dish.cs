@@ -27,11 +27,15 @@ namespace ConsoleApp1.Models
         [Required(ErrorMessage = "Price is required.")]
         [Range(0.01, 1000.00, ErrorMessage = "Price must be between $0.01 and $1000.")]
         public decimal Price { get; set; }
-        public decimal DiscountedPrice => Price * 0.9m;  // 10% discount
+        public decimal DiscountedPrice => Price - (Price * VatPercentage); 
+        public decimal VatPercentage { get; set; } = 0.2m;
+        public decimal PriceAfterTax => Price * (1 + VatPercentage);
         
         [Required(ErrorMessage = "Ingredients list cannot be empty.")]
         [MinLength(1, ErrorMessage = "At least one ingredient is required.")]
         public List<string> Ingredients { get; set; } = new List<string>();
+        
+        
 
         public Dish() { }
 
@@ -88,6 +92,13 @@ namespace ConsoleApp1.Models
             return false;
         }
         
+        public void AddIngredient(string ingredient)
+        {
+            if (string.IsNullOrWhiteSpace(ingredient))
+                throw new ArgumentException("Ingredient cannot be null or empty.");
+            Ingredients.Add(ingredient);
+        }
+        
         
         //OVERRIDES
         public override bool Equals(object obj)
@@ -105,7 +116,7 @@ namespace ConsoleApp1.Models
 
         public override string ToString()
         {
-            return $"Dish(IdDish={IdDish}, Name={Name}, Price={Price:C}, Discounted Price={DiscountedPrice:C})";
+            return $"Dish(IdDish={IdDish}, Name={Name}, Price={Price:C}, Discounted Price={DiscountedPrice:C}, Price After Tax={PriceAfterTax:C})";
         }
 
     }

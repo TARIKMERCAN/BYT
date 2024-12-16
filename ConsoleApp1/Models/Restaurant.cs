@@ -41,10 +41,12 @@ namespace ConsoleApp1.Models
         
         public void AddTable(Table table)
         {
-            if (table == null) throw new ArgumentNullException(nameof(table), "Table cannot be null.");
+            if (Tables.Count >= MaxCapacity)
+                throw new InvalidOperationException($"Cannot add more tables. Max capacity of {MaxCapacity} reached.");
             Tables.Add(table);
             Console.WriteLine($"Table with ID {table.IdTable} added to restaurant '{Name}'.");
         }
+
         
         public bool RemoveTable(int tableId)
         {
