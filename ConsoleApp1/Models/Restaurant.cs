@@ -33,7 +33,7 @@ namespace ConsoleApp1.Models
         }
 
         
-        //METHODS
+        //methods
         public int GetNumberOfTables()
         {
             return Tables.Count;
