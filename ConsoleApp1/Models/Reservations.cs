@@ -13,8 +13,22 @@ namespace ConsoleApp1.Models
         [Required(ErrorMessage = "Date of reservation is required.")]
         [DataType(DataType.DateTime, ErrorMessage = "Invalid date and time format.")]
         public DateTime DateOfReservation { get; set; }
-        
-        public Table ReservedTable { get; set; } 
+
+        private Table _reservedTable;
+
+        // Reverse connection property
+        public Table ReservedTable
+        {
+            get => _reservedTable;
+            set
+            {
+                if (_reservedTable == value) return;
+
+                _reservedTable?.RemoveReservation(this); // Remove from old table
+                _reservedTable = value;
+                _reservedTable?.AddReservation(this);    // Add to new table
+            }
+        }
 
         public Reservation() { }
 
@@ -24,8 +38,7 @@ namespace ConsoleApp1.Models
             DateOfReservation = dateOfReservation;
         }
 
-        
-        // METHODS
+        // Existing Method
         public bool ReserveTable(Table table, int minCapacity, int maxCapacity)
         {
             if (table == null)
@@ -33,62 +46,51 @@ namespace ConsoleApp1.Models
 
             if (table.NumberOfChairs < minCapacity || table.NumberOfChairs > maxCapacity)
             {
-                Console.WriteLine($"Table {table.IdTable} does not meet capacity requirements: " +
-                                  $"Required: {minCapacity}-{maxCapacity}, Available: {table.NumberOfChairs}.");
+                Console.WriteLine($"Table {table.IdTable} does not meet capacity requirements.");
                 return false;
             }
 
             if (DateOfReservation.Date < DateTime.Now.Date)
             {
-                Console.WriteLine($"Cannot reserve table for past dates. Attempted reservation for {DateOfReservation}.");
+                Console.WriteLine($"Cannot reserve table for past dates.");
                 return false;
             }
 
-            bool isAvailable = CheckTableAvailability(table, DateOfReservation);
-
-            if (!isAvailable)
-            {
-                Console.WriteLine($"Table {table.IdTable} is not available on {DateOfReservation}.");
-                return false;
-            }
-
-            ReservedTable = table;
+            ReservedTable = table; // Reverse connection handled
             Console.WriteLine($"Reservation {IdReservation} confirmed for Table {table.IdTable}.");
             return true;
         }
-
-
 
         private bool CheckTableAvailability(Table table, DateTime reservationDate)
         {
             var existingReservations = Reservation.Instances;
             foreach (var reservation in existingReservations)
             {
-                if (reservation.ReservedTable.IdTable == table.IdTable &&
+                if (reservation.ReservedTable?.IdTable == table.IdTable &&
                     reservation.DateOfReservation.Date == reservationDate.Date)
                 {
-                    Console.WriteLine($"Conflict found: Table {table.IdTable} already reserved for {reservation.DateOfReservation}.");
-                    return false; 
+                    Console.WriteLine($"Table {table.IdTable} already reserved for {reservation.DateOfReservation}.");
+                    return false;
                 }
             }
-            return true; 
+            return true;
         }
 
-        
-        
-        //OVERRIDES
-        public override bool Equals(object? obj)
+        // Added Methods
+        public void AddTable(Table table)
         {
-            if (obj == null || GetType() != obj.GetType())
-                return false;
-    
-            var other = (Reservation)obj;
-            return IdReservation == other.IdReservation && DateOfReservation == other.DateOfReservation && ReservedTable.Equals(other.ReservedTable);
+            if (table == null) throw new ArgumentNullException(nameof(table));
+            ReservedTable = table;
         }
 
-        public override int GetHashCode()
+        public void RemoveTable()
         {
-            return HashCode.Combine(IdReservation, DateOfReservation, ReservedTable);
+            if (ReservedTable != null)
+            {
+                var oldTable = ReservedTable;
+                ReservedTable = null;
+                Console.WriteLine($"Reservation {IdReservation} removed from Table {oldTable.IdTable}.");
+            }
         }
 
         public override string ToString()

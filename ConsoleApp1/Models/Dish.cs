@@ -4,8 +4,6 @@ using ConsoleApp1.Services;
 
 namespace ConsoleApp1.Models
 {
-    using System.ComponentModel.DataAnnotations;
-
     public class Dish : SerializableObject<Dish>
     {
         [Required(ErrorMessage = "Dish ID is required.")]
@@ -27,28 +25,39 @@ namespace ConsoleApp1.Models
         [Required(ErrorMessage = "Price is required.")]
         [Range(0.01, 1000.00, ErrorMessage = "Price must be between $0.01 and $1000.")]
         public decimal Price { get; set; }
-        public decimal DiscountedPrice => Price - (Price * VatPercentage); 
+
+        public decimal DiscountedPrice => Price - (Price * VatPercentage);
         public decimal VatPercentage { get; set; } = 0.2m;
         public decimal PriceAfterTax => Price * (1 + VatPercentage);
-        
+
         [Required(ErrorMessage = "Ingredients list cannot be empty.")]
         [MinLength(1, ErrorMessage = "At least one ingredient is required.")]
         public List<string> Ingredients { get; set; } = new List<string>();
-        
-        
 
+        // I added this part: Reverse connection to Menu
+        public Menu Menu { get; private set; }
+
+        // Constructor
         public Dish() { }
 
-        
-        //METHODS
+        // Set Menu for Reverse Connection
+        public void SetMenu(Menu menu)
+        {
+            Menu = menu;
+            Console.WriteLine(menu == null
+                ? $"Dish '{Name}' (ID: {IdDish}) is no longer associated with any menu."
+                : $"Dish '{Name}' (ID: {IdDish}) is now part of menu '{menu.Name}'.");
+        }
+
+        // METHODS
         public static Dish CreateDish(int idDish, string name, string cuisine, bool isVegetarian, bool isVegan,
             decimal price, List<string> ingredients)
         {
             if (ingredients == null || ingredients.Count == 0)
-            {
+                
                 throw new ArgumentException("At least one ingredient is required to create a dish.");
-            }
 
+            
             Dish dish = new Dish
             {
                 IdDish = idDish,
@@ -64,7 +73,7 @@ namespace ConsoleApp1.Models
             Console.WriteLine($"Dish '{name}' created with ID {idDish}.");
             return dish;
         }
-        
+
         public void ChangeDish(string? name = null, string? cuisine = null, bool? isVegetarian = null,
             bool? isVegan = null, decimal? price = null, List<string>? ingredients = null)
         {
@@ -77,12 +86,15 @@ namespace ConsoleApp1.Models
 
             Console.WriteLine($"Dish '{Name}' with ID {IdDish} has been updated.");
         }
-        
+
         public static bool RemoveDish(int idDish)
         {
             Dish? dishToRemove = Instances.Find(d => d.IdDish == idDish);
             if (dishToRemove != null)
             {
+                // I added this part: Clear reverse connection before removal
+                dishToRemove.SetMenu(null);
+
                 Instances.Remove(dishToRemove);
                 Console.WriteLine($"Dish with ID {idDish} has been removed.");
                 return true;
@@ -91,16 +103,15 @@ namespace ConsoleApp1.Models
             Console.WriteLine($"Dish with ID {idDish} not found.");
             return false;
         }
-        
+
         public void AddIngredient(string ingredient)
         {
             if (string.IsNullOrWhiteSpace(ingredient))
                 throw new ArgumentException("Ingredient cannot be null or empty.");
             Ingredients.Add(ingredient);
         }
-        
-        
-        //OVERRIDES
+
+        // OVERRIDES
         public override bool Equals(object obj)
         {
             if (obj is not Dish other)
@@ -118,6 +129,5 @@ namespace ConsoleApp1.Models
         {
             return $"Dish(IdDish={IdDish}, Name={Name}, Price={Price:C}, Discounted Price={DiscountedPrice:C}, Price After Tax={PriceAfterTax:C})";
         }
-
     }
 }

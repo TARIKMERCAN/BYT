@@ -16,35 +16,51 @@ namespace ConsoleApp1.Models
 
         [Required(ErrorMessage = "Table type is required.")]
         [StringLength(50, MinimumLength = 3, ErrorMessage = "Table type must be between 3 and 50 characters.")]
-        public string TableType { get; set; } 
+        public string TableType { get; set; }
 
-        public Table(){}
+        private readonly List<Reservation> _reservations = new();
+        public IReadOnlyList<Reservation> Reservations => _reservations.AsReadOnly();
+
+        public Table() { }
+
         public Table(int idTable, int numberOfChairs, string tableType)
         {
             IdTable = idTable;
             NumberOfChairs = numberOfChairs;
             TableType = tableType;
         }
-        
-       
-        //OVERRIDES
-        public override bool Equals(object? obj)
-        {
-            if (obj is Table other)
-            {
-                return IdTable == other.IdTable && NumberOfChairs == other.NumberOfChairs && TableType == other.TableType;
-            }
-            return false;
-        }
-        
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(IdTable, NumberOfChairs, TableType);
-        }
-        
+
+        // Existing Methods
         public override string ToString()
         {
             return $"Table {IdTable} - Type: {TableType}, Chairs: {NumberOfChairs}";
+        }
+
+        // Added Methods
+        public void AddReservation(Reservation reservation)
+        {
+            if (reservation == null) throw new ArgumentNullException(nameof(reservation));
+            if (_reservations.Contains(reservation)) return;
+
+            _reservations.Add(reservation);
+            if (reservation.ReservedTable != this)
+            {
+                reservation.AddTable(this); // Ensure reverse connection
+            }
+            Console.WriteLine($"Reservation {reservation.IdReservation} added to Table {IdTable}.");
+        }
+
+        public void RemoveReservation(Reservation reservation)
+        {
+            if (reservation == null) throw new ArgumentNullException(nameof(reservation));
+            if (_reservations.Remove(reservation))
+            {
+                if (reservation.ReservedTable == this)
+                {
+                    reservation.RemoveTable(); // Ensure reverse disconnection
+                }
+                Console.WriteLine($"Reservation {reservation.IdReservation} removed from Table {IdTable}.");
+            }
         }
     }
 }

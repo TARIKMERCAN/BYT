@@ -286,8 +286,9 @@ public class UnitTest1
         public void AddDish_ValidDish_AddsSuccessfully()
         {
             _menu.AddDish(_dish);
-            Assert.Contains(_dish, _menu.Dishes);
+            Assert.IsTrue(_menu.Dishes.Contains(_dish), "Dish was not added to the menu.");
         }
+
 
         [Test]
         public void RemoveDish_ValidId_RemovesSuccessfully()
