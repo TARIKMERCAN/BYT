@@ -13,6 +13,11 @@ namespace ConsoleApp1.Models
         private readonly List<Order> _orders = new();
         public IReadOnlyList<Order> Orders => _orders.AsReadOnly();
         
+        
+        private readonly Dictionary<int, Reservation> _reservations = new(); 
+        public IReadOnlyDictionary<int, Reservation> Reservations => _reservations; 
+
+        
         public void AddOrder(Order order)
         {
             if (order == null) throw new ArgumentNullException(nameof(order));
@@ -81,6 +86,32 @@ namespace ConsoleApp1.Models
             {
                 Console.WriteLine($"Payment failed for Order {order.IdOrder} by Customer {IdCustomer}.");
                 return false;
+            }
+        }
+        
+        public void AddReservation(Reservation reservation) 
+        {
+            if (reservation == null) throw new ArgumentNullException(nameof(reservation), "Reservation cannot be null.");
+            if (_reservations.ContainsKey(reservation.IdReservation))
+            {
+                Console.WriteLine($"Reservation {reservation.IdReservation} already exists for Customer {IdCustomer}.");
+                return;
+            }
+            _reservations.Add(reservation.IdReservation, reservation);
+            reservation.SetCustomer(this); 
+            Console.WriteLine($"Reservation {reservation.IdReservation} added to Customer {IdCustomer}.");
+        }
+
+        public void RemoveReservation(int reservationId)
+        {
+            if (_reservations.Remove(reservationId, out var reservation))
+            {
+                reservation.RemoveCustomer(); 
+                Console.WriteLine($"Reservation {reservationId} removed from Customer {IdCustomer}.");
+            }
+            else
+            {
+                Console.WriteLine($"Reservation {reservationId} not found for Customer {IdCustomer}.");
             }
         }
         

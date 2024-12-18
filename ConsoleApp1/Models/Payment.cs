@@ -21,7 +21,7 @@ namespace ConsoleApp1.Models
         [Required(ErrorMessage = "Payment status is required.")]
         public PaymentStatus Status { get; set; } = PaymentStatus.Pending;
         
-        private Order _order; // Added: private field to store Order
+        private Order _order;
 
         public Payment() { }
         
@@ -66,13 +66,13 @@ namespace ConsoleApp1.Models
             return true;
         }
         
-        public Order Order // Added: Property for reverse connection
+        public Order Order 
         {
             get => _order;
             private set => _order = value;
         }
 
-        public void SetOrder(Order order) // Added: Method to associate Order
+        public void SetOrder(Order order) 
         {
             if (_order == order) return;
 
@@ -80,7 +80,7 @@ namespace ConsoleApp1.Models
             Console.WriteLine($"Order {order?.IdOrder} associated with Payment {IdPayment}.");
         }
 
-        public void RemoveOrder() // Added: Method to remove Order association
+        public void RemoveOrder() 
         {
             if (_order != null)
             {

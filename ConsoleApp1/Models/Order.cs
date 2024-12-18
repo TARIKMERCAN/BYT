@@ -16,7 +16,7 @@ public class Order : SerializableObject<Order>
     public List<OrderDish> OrderDishes { get; private set; } = new List<OrderDish>();
     public Customer Customer { get; private set; }  
     
-    private Payment _payment; // Added: private field to store Payment
+    private Payment _payment; 
 
     public int TotalItems => OrderDishes.Sum(orderDish => orderDish.Quantity);  
     
@@ -53,27 +53,27 @@ public class Order : SerializableObject<Order>
     {
         return OrderDishes.Sum(orderDish => orderDish.TotalPrice);  
     }
-    public Payment Payment // Added: Property with reverse connection
+    public Payment Payment 
     {
         get => _payment;
         private set
         {
             if (_payment == value) return;
 
-            _payment?.RemoveOrder(); // Ensure reverse disconnection
+            _payment?.RemoveOrder(); 
             _payment = value;
-            _payment?.SetOrder(this); // Ensure reverse connection
+            _payment?.SetOrder(this); 
         }
     }
 
-    public void SetPayment(Payment payment) // Added: Method to associate Payment
+    public void SetPayment(Payment payment) 
     {
         if (payment == null) throw new ArgumentNullException(nameof(payment));
         Payment = payment;
         Console.WriteLine($"Payment {payment.IdPayment} associated with Order {IdOrder}.");
     }
 
-    public void RemovePayment() // Added: Method to remove Payment association
+    public void RemovePayment() 
     {
         if (Payment != null)
         {

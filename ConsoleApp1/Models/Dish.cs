@@ -34,13 +34,10 @@ namespace ConsoleApp1.Models
         [MinLength(1, ErrorMessage = "At least one ingredient is required.")]
         public List<string> Ingredients { get; set; } = new List<string>();
 
-        // I added this part: Reverse connection to Menu
         public Menu Menu { get; private set; }
 
-        // Constructor
         public Dish() { }
 
-        // Set Menu for Reverse Connection
         public void SetMenu(Menu menu)
         {
             Menu = menu;
@@ -92,7 +89,6 @@ namespace ConsoleApp1.Models
             Dish? dishToRemove = Instances.Find(d => d.IdDish == idDish);
             if (dishToRemove != null)
             {
-                // I added this part: Clear reverse connection before removal
                 dishToRemove.SetMenu(null);
 
                 Instances.Remove(dishToRemove);

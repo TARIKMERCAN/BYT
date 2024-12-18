@@ -16,6 +16,8 @@ namespace ConsoleApp1.Models
 
         private Table _reservedTable;
 
+        private Customer _customer; 
+
         // Reverse connection property
         public Table ReservedTable
         {
@@ -24,9 +26,9 @@ namespace ConsoleApp1.Models
             {
                 if (_reservedTable == value) return;
 
-                _reservedTable?.RemoveReservation(this); // Remove from old table
+                _reservedTable?.RemoveReservation(this); 
                 _reservedTable = value;
-                _reservedTable?.AddReservation(this);    // Add to new table
+                _reservedTable?.AddReservation(this);    
             }
         }
 
@@ -38,7 +40,28 @@ namespace ConsoleApp1.Models
             DateOfReservation = dateOfReservation;
         }
 
-        // Existing Method
+        public Customer Customer 
+        {
+            get => _customer;
+            private set => _customer = value;
+        }
+
+        public void SetCustomer(Customer customer) 
+        {
+            if (_customer == customer) return;
+
+            _customer?.RemoveReservation(IdReservation); 
+        }
+
+        public void RemoveCustomer() 
+        {
+            if (_customer != null)
+            {
+                var oldCustomer = _customer;
+                _customer = null;
+                Console.WriteLine($"Reservation {IdReservation} removed from Customer {oldCustomer.IdCustomer}.");
+            }
+        }
         public bool ReserveTable(Table table, int minCapacity, int maxCapacity)
         {
             if (table == null)
@@ -56,7 +79,7 @@ namespace ConsoleApp1.Models
                 return false;
             }
 
-            ReservedTable = table; // Reverse connection handled
+            ReservedTable = table; 
             Console.WriteLine($"Reservation {IdReservation} confirmed for Table {table.IdTable}.");
             return true;
         }
